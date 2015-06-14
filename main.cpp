@@ -48,8 +48,8 @@ int main( int argc, char** argv )
 
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
         imshow("Original", img); //show the original image
-        
-        
+
+        cout << (keypoints.size() > 5 ? "objeto detectado" : " ") << endl;
 
         if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
         {
