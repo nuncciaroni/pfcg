@@ -9,9 +9,26 @@
 using namespace cv;
 using namespace std;
 
+float Distance(Point p1, Point p2)
+{
+    return hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+bool Collision(Point p1, float rayP1, Point p2, float rayP2)
+{
+    if(Distance(p1, p2) < (rayP1 + rayP2))
+        return true;
+    return false;
+}
+
 int main( int argc, char** argv )
 {
     VideoCapture cap(1); //capture the video from web cam
+
+    //Point winSize(cap.get(CV_CAP_PROP_FRAME_WIDTH), cap.get(CV_CAP_PROP_FRAME_HEIGHT));
+    Point winSize(cap.get(CV_CAP_PROP_FRAME_WIDTH), 0);
+    float raio1 = 80;
+    float raio2 = 150;
 
     int minHessian = 400;
     Mat img;
@@ -44,10 +61,27 @@ int main( int argc, char** argv )
 
         detector.detect(imgThresholded, keypoints);
 
+        morphologyEx(imgThresholded, imgThresholded, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(5, 5)));
+        morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, getStructuringElement(MORPH_RECT, Size(5, 5)));
+
+        Moments objMoments = moments(imgThresholded);
+        float dM01 = objMoments.m01;
+        float dM10 = objMoments.m10;
+        float dArea = objMoments.m00;
+        if (dArea > 10000)
+        {
+            cout << "X " << dM10/dArea << endl;
+            cout << "Y " << dM01/dArea << endl;
+            if (Collision(Point(dM10/dArea, dM01/dArea), raio1, winSize, raio2))
+                cout << "Objeto dentro de area " << endl;
+        }
+
         drawKeypoints(imgOriginal, keypoints, img, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 
+        circle(imgOriginal, Point(dM10/dArea, dM01/dArea), raio1, Scalar(0, 0, 255), 3);
+        circle(imgOriginal,winSize, raio2, Scalar(0, 0, 255), 3);
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        imshow("Original", img); //show the original image
+        imshow("Original", imgOriginal); //show the original image
 
         cout << (keypoints.size() > 5 ? "objeto detectado" : " ") << endl;
 
