@@ -21,7 +21,7 @@ bool Collision(Point p1, float rayP1, Point p2, float rayP2)
     return false;
 }
 
-int main( int argc, char** argv )
+int main()
 {
     VideoCapture cap(1); //capture the video from web cam
 
@@ -53,7 +53,7 @@ int main( int argc, char** argv )
 
     while (true)
     {
-        bool bSuccess = cap.read(imgOriginal); // read a new frame from video
+        cap.read(imgOriginal); // read a new frame from video
 
         cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
 
@@ -61,8 +61,8 @@ int main( int argc, char** argv )
 
         detector.detect(imgThresholded, keypoints);
 
-        morphologyEx(imgThresholded, imgThresholded, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(5, 5)));
-        morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, getStructuringElement(MORPH_RECT, Size(5, 5)));
+        morphologyEx(imgThresholded, imgThresholded, MORPH_OPEN, getStructuringElement(MORPH_RECT, Size(3, 3)));
+        morphologyEx(imgThresholded, imgThresholded, MORPH_CLOSE, getStructuringElement(MORPH_RECT, Size(3, 3)));
 
         Moments objMoments = moments(imgThresholded);
         float dM01 = objMoments.m01;
